@@ -1,0 +1,10 @@
+[%autowidth.stretch, cols="h,a"]
+|===
+|Base package
+|`com.notification.infra`
+|Spring components
+|* `c.n.i.port.DistributedLock` (via `c.n.i.memory.InMemoryDistributedLock`)
+* `c.n.i.port.IdempotencyStore` (via `c.n.i.memory.InMemoryIdempotencyStore`)
+* `c.n.i.port.NodeIdProvider` (via `c.n.i.memory.RandomNodeIdProvider`)
+* `c.n.i.util.id.TsidGenerator`
+|===

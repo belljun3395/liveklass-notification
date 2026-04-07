@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.26">
+<title>NotificationJob 생명주기 가이드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment the following line when using as a custom stylesheet */
+/* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+html{font-family:sans-serif;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+b,strong{font-weight:bold}
+abbr{font-size:.9em}
+abbr[title]{cursor:help;border-bottom:1px dotted #dddddf;text-decoration:none}
+dfn{font-style:italic}
+hr{height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type=checkbox],input[type=radio]{padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,::before,::after{box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;line-height:1;position:relative;cursor:auto;-moz-tab-size:4;-o-tab-size:4;tab-size:4;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ul.square{list-style-type:square}
+ul.circle ul:not([class]),ul.disc ul:not([class]),ul.square ul:not([class]){list-style:inherit}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:1px solid #dedede;word-wrap:normal}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre).nobreak{word-wrap:normal}
+:not(pre).nowrap{white-space:nowrap}
+:not(pre).pre-wrap{white-space:pre-wrap}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;border-radius:3px;box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 0 0 .1em #fff;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin:0 auto;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child{border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:flex;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border:1px solid #e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:none;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:hsla(0,0%,100%,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details{margin-left:1.25rem}
+details>summary{cursor:pointer;display:block;position:relative;line-height:1.6;margin-bottom:.625rem;outline:none;-webkit-tap-highlight-color:transparent}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"";border:solid transparent;border-left:solid;border-width:.3em 0 .3em .5em;position:absolute;top:.5em;left:-1.25rem;transform:translateX(15%)}
+details[open]>summary::before{border:solid transparent;border-top:solid;border-width:.5em .3em 0;transform:translateY(15%)}
+details>summary::after{content:"";width:1.25rem;height:1em;position:absolute;top:.3em;left:-1.25rem}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class=paragraph]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border:1px solid #e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;border-radius:4px}
+.sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:first-child,.sidebarblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child,.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class=highlight],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock pre>code{display:block}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos,pre.pygments .linenos{border-right:1px solid;opacity:.35;padding-right:.5em;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+pre.pygments span.linenos{display:inline-block;margin-right:.75em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock:not(.excerpt)>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans-serif;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;font-size:.85rem;text-align:left;margin-right:0}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content{margin-bottom:1.25em;word-wrap:anywhere}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>*>tr>*{border-width:1px}
+table.grid-cols>*>tr>*{border-width:0 1px}
+table.grid-rows>*>tr>*{border-width:1px 0}
+table.frame-all{border-width:1px}
+table.frame-ends{border-width:1px 0}
+table.frame-sides{border-width:0 1px}
+table.frame-none>colgroup+*>:first-child>*,table.frame-sides>colgroup+*>:first-child>*{border-top-width:0}
+table.frame-none>:last-child>:last-child>*,table.frame-sides>:last-child>:last-child>*{border-bottom-width:0}
+table.frame-none>*>tr>:first-child,table.frame-ends>*>tr>:first-child{border-left-width:0}
+table.frame-none>*>tr>:last-child,table.frame-ends>*>tr>:last-child{border-right-width:0}
+table.stripes-all>*>tr,table.stripes-odd>*>tr:nth-of-type(odd),table.stripes-even>*>tr:nth-of-type(even),table.stripes-hover>*>tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+li>p:empty:only-child::before{content:"";display:inline-block}
+ul.checklist>li>p:first-child{margin-left:-1em}
+ul.checklist>li>p:first-child>.fa-square-o:first-child,ul.checklist>li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist>li>p:first-child>input[type=checkbox]:first-child{margin-right:.25em}
+ul.inline{display:flex;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+td.hdlist2{word-wrap:anywhere}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:4px solid #fff;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active,#footnotes .footnote a:first-of-type:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);border-radius:50%;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt,summary{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,td.hdlist1,span.alt,summary{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]{border-bottom:1px dotted}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#header,#content,#footnotes,#footer{max-width:none}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media amzn-kf8,print{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+<style>
+/*! Asciidoctor Tabs | Copyright (c) 2018-present Dan Allen | MIT License */
+.tabs {
+    margin-bottom: 1.25em;
+}
+
+.tablist > ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tablist > ul li {
+    align-items: center;
+    background-color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-weight: bold;
+    line-height: 1.5;
+    padding: 0.25em 1em;
+    position: relative;
+}
+
+.tablist > ul li:focus-visible {
+    outline: none;
+}
+
+.tablist.ulist,
+.tablist.ulist > ul li {
+    margin: 0;
+}
+
+.tablist.ulist > ul li + li {
+    margin-left: 0.25em;
+}
+
+.tabs .tablist li::after {
+    content: "";
+    display: block;
+    height: 1px;
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+}
+
+.tabs.is-loading .tablist li:not(:first-child),
+.tabs:not(.is-loading) .tablist li:not(.is-selected) {
+    background-color: #f5f5f5;
+}
+
+.tabs.is-loading .tablist li:first-child::after,
+.tabs:not(.is-loading) .tablist li.is-selected::after {
+    background-color: #fff;
+}
+
+/*
+.tabs:not(.is-loading) .tablist li,
+.tabs:not(.is-loading) .tablist li::after {
+  transition: background-color 200ms ease-in-out;
+}
+*/
+
+.tablist > ul p {
+    line-height: inherit;
+    margin: 0;
+}
+
+.tabpanel {
+    background-color: #fff;
+    padding: 1.25em;
+}
+
+.tablist > ul li,
+.tabpanel {
+    border: 1px solid #dcdcdc;
+}
+
+.tablist > ul li {
+    border-bottom: 0;
+}
+
+.tabs.is-loading .tabpanel + .tabpanel,
+.tabs:not(.is-loading) .tabpanel.is-hidden {
+    display: none;
+}
+
+.tabpanel > :first-child {
+    margin-top: 0;
+}
+
+/* #content is a signature of the Asciidoctor standalone HTML output */
+#content .tabpanel > :last-child,
+#content .tabpanel > :last-child > :last-child,
+#content .tabpanel > :last-child > :last-child > li:last-child > :last-child {
+    margin-bottom: 0;
+}
+
+.tablecontainer {
+    overflow-x: auto;
+}
+
+#content .tablecontainer {
+    margin-bottom: 1.25em;
+}
+
+#content .tablecontainer > table.tableblock {
+    margin-bottom: 0;
+}
+</style>
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>NotificationJob 생명주기 가이드</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_개요">개요</a></li>
+<li><a href="#_상태_다이어그램">상태 다이어그램</a></li>
+<li><a href="#_job_상태_설명">Job 상태 설명</a></li>
+<li><a href="#_jobnotificationpolicy_정책">JobNotificationPolicy (정책)</a>
+<ul class="sectlevel2">
+<li><a href="#_정책_목록">정책 목록</a></li>
+<li><a href="#_정책이_적용되는_방식">정책이 적용되는 방식</a></li>
+</ul>
+</li>
+<li><a href="#_실행_주체별_상태_전이">실행 주체별 상태 전이</a>
+<ul class="sectlevel2">
+<li><a href="#_usecase_사용자_요청">UseCase (사용자 요청)</a></li>
+<li><a href="#_processor_이벤트_핸들러">Processor (이벤트 핸들러)</a></li>
+<li><a href="#_relay_db_스케줄_폴링">Relay (DB 스케줄 폴링)</a></li>
+<li><a href="#_schedule_주기적_폴링_기동_시_복구">Schedule (주기적 폴링 / 기동 시 복구)</a></li>
+<li><a href="#_orchestrator_발송_파이프라인">Orchestrator (발송 파이프라인)</a></li>
+</ul>
+</li>
+<li><a href="#_전체_파이프라인_흐름">전체 파이프라인 흐름</a></li>
+<li><a href="#_동시성_제어">동시성 제어</a>
+<ul class="sectlevel2">
+<li><a href="#_방어_메커니즘">방어 메커니즘</a></li>
+<li><a href="#_중복_발송_방지_분석">중복 발송 방지 분석</a>
+<ul class="sectlevel3">
+<li><a href="#_현재_모델의_성격">현재 모델의 성격</a></li>
+<li><a href="#_시나리오_1_외부_발송_성공_후_크래시_위험도_높음">시나리오 1: 외부 발송 성공 후 크래시 (위험도: 높음)</a></li>
+<li><a href="#_시나리오_2_같은_job에_대한_이중_실행_위험도_방어됨">시나리오 2: 같은 Job에 대한 이중 실행 (위험도: 방어됨)</a></li>
+<li><a href="#_시나리오_3_stuckrecovery와_활성_실행의_충돌_위험도_방어됨">시나리오 3: StuckRecovery와 활성 실행의 충돌 (위험도: 방어됨)</a></li>
+<li><a href="#_시나리오_4_스케줄_중복_처리_위험도_낮음">시나리오 4: 스케줄 중복 처리 (위험도: 낮음)</a></li>
+<li><a href="#_시나리오_5_recover_uc와_retryingscheduler_레이스_위험도_없음">시나리오 5: Recover UC와 RetryingScheduler 레이스 (위험도: 없음)</a></li>
+<li><a href="#_요약">요약</a></li>
+<li><a href="#_현재_모델을_한_문장으로_표현하면">현재 모델을 한 문장으로 표현하면</a></li>
+</ul>
+</li>
+<li><a href="#_트랜잭션_경계_설계">트랜잭션 경계 설계</a>
+<ul class="sectlevel3">
+<li><a href="#_원칙">원칙</a></li>
+<li><a href="#_호출_지점별_설계">호출 지점별 설계</a></li>
+<li><a href="#_분리하지_않는_호출_notificationservice_send">분리하지 않는 호출: <code>NotificationService.send()</code></a></li>
+<li><a href="#_uc의_락_트랜잭션_순서">UC의 락-트랜잭션 순서</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_이벤트_흐름">이벤트 흐름</a></li>
+<li><a href="#_참고">참고</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_개요"><a class="anchor" href="#_개요"></a>개요</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>`NotificationJob`은 알림 발송의 단위입니다.
+Job은 7개의 상태를 가지며, UseCase/Scheduler/Processor가 `JobNotificationPolicy`를 통해 상태를 전이합니다.</p>
+</div>
+<div class="paragraph">
+<p>이 문서는 <strong>누가(실행 주체)</strong> 어떤 <strong>정책(Policy)</strong>을 사용하여 상태를 전이하는지를 종합적으로 기술합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_상태_다이어그램"><a class="anchor" href="#_상태_다이어그램"></a>상태 다이어그램</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="notification-job-lifecycle.svg" alt="notification job lifecycle" width="1097" height="747">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_job_상태_설명"><a class="anchor" href="#_job_상태_설명"></a>Job 상태 설명</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 28.5714%;">
+<col style="width: 14.2857%;">
+<col style="width: 57.1429%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">상태</th>
+<th class="tableblock halign-left valign-top">유형</th>
+<th class="tableblock halign-left valign-top">설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CREATED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">초기</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Job이 생성된 초기 상태. 발송 시각 확정 전</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>SCHEDULED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">진행</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">발송 시각이 확정되어 스케줄러에 등록된 상태</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PROCESSING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">진행</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">알림 발송이 실제로 진행 중인 상태</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RETRYING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">진행</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">실패/취소 후 재처리를 준비 중인 상태</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CANCELLED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">취소</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Job이 취소된 상태. RETRYING으로 재시도 가능</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>FAILED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">오류</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">처리 중 실패한 상태. RETRYING으로 전이 가능</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>COMPLETED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">종료</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">모든 알림 발송이 완료된 최종 상태 (terminal)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_jobnotificationpolicy_정책"><a class="anchor" href="#_jobnotificationpolicy_정책"></a>JobNotificationPolicy (정책)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>`JobNotificationPolicy`는 <strong>Job 상태 전이</strong>와 그에 수반되는 <strong>Notification 상태 전이</strong>를 하나의 enum 상수로 선언합니다.
+호출부가 정책 상수를 명시적으로 선택하며, 런타임에서 동적 조회는 하지 않습니다.</p>
+</div>
+<div class="sect2">
+<h3 id="_정책_목록"><a class="anchor" href="#_정책_목록"></a>정책 목록</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">정책</th>
+<th class="tableblock halign-left valign-top">Job From</th>
+<th class="tableblock halign-left valign-top">Job To</th>
+<th class="tableblock halign-left valign-top">Notification 전이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_SCHEDULED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CREATED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SCHEDULED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">없음</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_PROCESSING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SCHEDULED, RETRYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PENDING &#8594; SENDING<br>
+RETRY_WAITING &#8594; SENDING<br>
+SENDING &#8594; SENT<br>
+SENDING &#8594; FAILED<br>
+FAILED &#8594; RETRY_WAITING<br>
+FAILED &#8594; DEAD_LETTER</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_CANCELLED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CREATED, SCHEDULED, RETRYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CANCELLED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PENDING &#8594; CANCELLED<br>
+RETRY_WAITING &#8594; CANCELLED<br>
+FAILED &#8594; CANCELLED<br>
+DEAD_LETTER &#8594; CANCELLED</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_RETRYING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FAILED, CANCELLED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RETRYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DEAD_LETTER &#8594; RETRY_WAITING<br>
+CANCELLED &#8594; RETRY_WAITING</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_COMPLETED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">COMPLETED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">없음</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_FAILED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FAILED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">없음</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>STUCK_RECOVERY</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FAILED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SENDING &#8594; DEAD_LETTER</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>STUCK_SENDING_ROLLBACK</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SENDING &#8594; RETRY_WAITING</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_정책이_적용되는_방식"><a class="anchor" href="#_정책이_적용되는_방식"></a>정책이 적용되는 방식</h3>
+<div class="paragraph">
+<p>`NotificationJob`은 두 가지 방식으로 정책을 사용합니다.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Job 상태 전이</strong>&#8201;&#8212;&#8201;<code>transitionTo(policy)</code>: `policy.fromStatuses`에 현재 상태가 포함되면 `policy.toStatus`로 전이</p>
+</li>
+<li>
+<p><strong>Notification 상태 전이 검증</strong>&#8201;&#8212;&#8201;<code>assertNotificationTransitionAllowed(policy, from, to)</code>: 정책에 선언된 <code>NotificationTransition</code> 집합에 해당 전이가 포함되는지 확인</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span style="color:#777">// Job 상태 전이 (예: markProcessing)</span>
+<span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">boolean</span> markProcessing() {
+    <span style="color:#080;font-weight:bold">return</span> transitionTo(JobNotificationPolicy.TO_PROCESSING);
+}
+
+<span style="color:#777">// Notification 상태 전이 검증 (예: startSendingNotification)</span>
+<span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">void</span> startSendingNotification(<span style="color:#0a8;font-weight:bold">Notification</span> n) {
+    assertNotificationTransitionAllowed(
+        JobNotificationPolicy.TO_PROCESSING,
+        n.getStatus(), NotificationStatus.SENDING);
+    n.markSending();
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_실행_주체별_상태_전이"><a class="anchor" href="#_실행_주체별_상태_전이"></a>실행 주체별 상태 전이</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_usecase_사용자_요청"><a class="anchor" href="#_usecase_사용자_요청"></a>UseCase (사용자 요청)</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">클래스</th>
+<th class="tableblock halign-left valign-top">전이</th>
+<th class="tableblock halign-left valign-top">정책</th>
+<th class="tableblock halign-left valign-top">비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CreateScheduledNotificationJobUseCase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8594; CREATED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(팩토리)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Job + Notification(PENDING) 생성, <code>NotificationJobCreatedEvent</code> 발행</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CancelNotificationJobUseCase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CREATED/SCHEDULED/RETRYING &#8594; CANCELLED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_CANCELLED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">분산 락 + SELECT FOR UPDATE.<br>
+Notification 일괄 취소(PENDING/RETRY_WAITING/FAILED/DEAD_LETTER &#8594; CANCELLED).<br>
+스케줄 해제</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RecoverNotificationJobUseCase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FAILED/CANCELLED &#8594; RETRYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_RETRYING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">분산 락 + SELECT FOR UPDATE.<br>
+Notification 리셋(DEAD_LETTER/CANCELLED &#8594; RETRY_WAITING).<br>
+같은 트랜잭션에서 처리하여 RetryingScheduler 선점 레이스 방지</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_processor_이벤트_핸들러"><a class="anchor" href="#_processor_이벤트_핸들러"></a>Processor (이벤트 핸들러)</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">클래스</th>
+<th class="tableblock halign-left valign-top">전이</th>
+<th class="tableblock halign-left valign-top">정책</th>
+<th class="tableblock halign-left valign-top">비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobCreatedProcessor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CREATED &#8594; SCHEDULED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_SCHEDULED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobCreatedEvent</code> 수신.<br>
+`schedulePort.schedule()`로 발송 시각 등록</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobExecutionProcessor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(PROCESSING 상태 확인 후 실행)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobExecutionEvent</code> 수신.<br>
+Job 상태 전이 없음, <code>SendOrchestrator.execute()</code> 위임.<br>
+분산 락 + Watchdog(TTL/3 주기 갱신)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobStatusChangedProcessor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobStatusChangedEvent</code> 수신.<br>
+이력 기록 전용(<code>JobStatusHistoryRecorder</code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_relay_db_스케줄_폴링"><a class="anchor" href="#_relay_db_스케줄_폴링"></a>Relay (DB 스케줄 폴링)</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">클래스</th>
+<th class="tableblock halign-left valign-top">전이</th>
+<th class="tableblock halign-left valign-top">정책</th>
+<th class="tableblock halign-left valign-top">비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DbScheduledNotificationJobRelay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SCHEDULED &#8594; PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_PROCESSING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INITIAL 타입 스케줄 폴링.<br>
+발송 시각 도달 시 전이 + <code>NotificationJobStatusChangedEvent</code> 발행</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>DbRetryScheduledNotificationRecoverRelay</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FAILED &#8594; RETRYING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_RETRYING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RETRY 타입 스케줄 폴링.<br>
+자동 재시도 시각 도달 시 전이.<br>
+분산 락 사용</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_schedule_주기적_폴링_기동_시_복구"><a class="anchor" href="#_schedule_주기적_폴링_기동_시_복구"></a>Schedule (주기적 폴링 / 기동 시 복구)</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">클래스</th>
+<th class="tableblock halign-left valign-top">전이</th>
+<th class="tableblock halign-left valign-top">정책</th>
+<th class="tableblock halign-left valign-top">비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RetryingNotificationJobExecutionScheduler</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RETRYING &#8594; PROCESSING</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_PROCESSING</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RETRYING Job 폴링.<br>
+전이 후 <code>NotificationJobExecutionEvent</code> 발행.<br>
+분산 락 사용</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ProcessingNotificationJobExecutionScheduler</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING Job 폴링.<br>
+Job 상태 전이 없음, <code>NotificationJobExecutionEvent</code> 재발행</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>StuckProcessingRecoveryScheduler</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING &#8594; FAILED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>STUCK_RECOVERY</code><br>
+<code>STUCK_SENDING_ROLLBACK</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">타임아웃 초과 PROCESSING Job 감지.<br>
+잔류 SENDING 알림별:<br>
+  <code>sendTryCount &lt; max</code> → RETRY_WAITING(롤백)<br>
+  <code>sendTryCount &gt;= max</code> → DEAD_LETTER(최종 실패)<br>
+모든 알림이 처리된 후 재시도할 알림(RETRY_WAITING)이 없으면 Job → FAILED 전이</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobRestartReconciler</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">&#8201;&#8212;&#8201;</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>STUCK_SENDING_ROLLBACK</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ApplicationReadyEvent</code> 수신, 기동 시 1회 실행.<br>
+PROCESSING Job의 잔류 SENDING &#8594; RETRY_WAITING 롤백.<br>
+Job 상태는 PROCESSING 유지</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_orchestrator_발송_파이프라인"><a class="anchor" href="#_orchestrator_발송_파이프라인"></a>Orchestrator (발송 파이프라인)</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">클래스</th>
+<th class="tableblock halign-left valign-top">전이</th>
+<th class="tableblock halign-left valign-top">정책</th>
+<th class="tableblock halign-left valign-top">비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobSendOrchestrator</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING &#8594; COMPLETED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_COMPLETED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">모든 알림 발송 성공 시</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobSendOrchestrator</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PROCESSING &#8594; FAILED</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>TO_FAILED</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">발송 실패 존재 시.<br>
+retryable 알림이 있으면 <code>schedulePort.retrySchedule()</code> 등록</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_전체_파이프라인_흐름"><a class="anchor" href="#_전체_파이프라인_흐름"></a>전체 파이프라인 흐름</h2>
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="notification-job-pipeline.svg" alt="notification job pipeline" width="2244" height="1244">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_동시성_제어"><a class="anchor" href="#_동시성_제어"></a>동시성 제어</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_방어_메커니즘"><a class="anchor" href="#_방어_메커니즘"></a>방어 메커니즘</h3>
+<div class="paragraph">
+<p>모든 상태 전이 주체는 다음 패턴을 조합하여 중복 처리를 방지합니다:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>분산 락</strong> (<code>DistributedLock.tryLock(idempotencyKey, ttl)</code>)&#8201;&#8212;&#8201;다중 인스턴스 간 상호 배제</p>
+</li>
+<li>
+<p><strong>SELECT FOR UPDATE</strong> (<code>findByIdAndDeletedFalseForUpdate</code>)&#8201;&#8212;&#8201;DB 수준 행 잠금으로 동시 전이 차단</p>
+</li>
+<li>
+<p><strong>상태 재검증</strong>&#8201;&#8212;&#8201;잠금 획득 후 현재 상태가 전이 가능한지 재확인 (예: <code>markProcessing()</code> 실패 시 스킵)</p>
+</li>
+<li>
+<p><strong>SENDING 선점 저장</strong>&#8201;&#8212;&#8201;발송 전 Notification을 SENDING으로 먼저 커밋하여 다른 실행자가 같은 알림을 선택하지 못하게 함</p>
+</li>
+</ol>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6668%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">실행 주체</th>
+<th class="tableblock halign-left valign-top">분산 락</th>
+<th class="tableblock halign-left valign-top">SELECT FOR UPDATE</th>
+<th class="tableblock halign-left valign-top">Watchdog</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CreateScheduledNotificationJobUseCase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CancelNotificationJobUseCase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RecoverNotificationJobUseCase</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NotificationJobCreatedProcessor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NotificationJobExecutionProcessor</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O (TTL/3)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DbScheduledNotificationJobRelay</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DbRetryScheduledNotificationRecoverRelay</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RetryingNotificationJobExecutionScheduler</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">StuckProcessingRecoveryScheduler</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NotificationJobRestartReconciler</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">X</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_중복_발송_방지_분석"><a class="anchor" href="#_중복_발송_방지_분석"></a>중복 발송 방지 분석</h3>
+<div class="paragraph">
+<p>이 시스템의 핵심 요구사항은 <strong>같은 Notification이 두 번 발송되면 안 된다</strong>는 것입니다.
+아래는 중복 발송이 발생할 수 있는 시나리오와 현재 방어 구조를 분석한 결과입니다.</p>
+</div>
+<div class="sect3">
+<h4 id="_현재_모델의_성격"><a class="anchor" href="#_현재_모델의_성격"></a>현재 모델의 성격</h4>
+<div class="paragraph">
+<p>현재 구조는 <strong>exactly-once가 아닌 복구 가능한 at-least-once 발송 모델</strong>입니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>중복 실행 억제</strong>는 잘 하고 있음</p>
+</li>
+<li>
+<p>하지만 <strong>중복 발송 절대 금지</strong>를 외부 채널 수준에서 보장하지는 못함</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>가장 큰 이유는 <strong>외부 발송 성공과 DB 상태 반영(SENT)이 원자적이지 않기 때문</strong>입니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_시나리오_1_외부_발송_성공_후_크래시_위험도_높음"><a class="anchor" href="#_시나리오_1_외부_발송_성공_후_크래시_위험도_높음"></a>시나리오 1: 외부 발송 성공 후 크래시 (위험도: 높음)</h4>
+<div class="paragraph">
+<p><strong>상황:</strong> Notification이 외부 채널로 실제 발송된 직후, DB에 SENT로 반영하기 전에 프로세스가 종료됩니다.</p>
+</div>
+<div class="paragraph">
+<p><strong>흐름:</strong></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="concurrency-scenario-1.svg" alt="concurrency scenario 1" width="1116" height="712">
+</div>
+</div>
+<div class="paragraph">
+<p><strong>방어 (시스템 레벨):</strong> 없음. Job/Notification 상태 머신에서는 방지 불가능.</p>
+</div>
+<div class="paragraph">
+<p><strong>방어 (채널 레벨):</strong> 외부 발송 채널이 idempotency key를 지원하면 차단 가능. 예: 이메일 서비스의 <code>Message-ID</code>, FCM의 <code>send_id</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>판단:</strong> 구현 실수가 아니라 구조적 한계입니다. 외부 시스템과의 분산 트랜잭션 없이는 시스템 레벨 완전 방지 불가능. at-least-once 모델의 근본적 한계이므로, 외부 채널의 idempotency 보장에 의존합니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_시나리오_2_같은_job에_대한_이중_실행_위험도_방어됨"><a class="anchor" href="#_시나리오_2_같은_job에_대한_이중_실행_위험도_방어됨"></a>시나리오 2: 같은 Job에 대한 이중 실행 (위험도: 방어됨)</h4>
+<div class="paragraph">
+<p><strong>상황:</strong> `ProcessingNotificationJobExecutionScheduler`가 PROCESSING 상태의 Job에 대해 execution event를 반복 발행합니다. 두 ExecutionProcessor가 동시에 같은 Job을 처리하려 합니다.</p>
+</div>
+<div class="paragraph">
+<p><strong>흐름:</strong></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="concurrency-scenario-2.svg" alt="concurrency scenario 2" width="811" height="826">
+</div>
+</div>
+<div class="paragraph">
+<p><strong>방어:</strong> 3단계로 방어됩니다.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>분산 락</strong>&#8201;&#8212;&#8201;대부분의 중복 진입을 차단</p>
+</li>
+<li>
+<p><strong>SELECT FOR UPDATE</strong>&#8201;&#8212;&#8201;`@ApplicationModuleListener`의 REQUIRES_NEW 트랜잭션 범위와 행 잠금이 일치하여, 발송 완료까지 다른 실행자가 대기</p>
+</li>
+<li>
+<p><strong>SENDING 선점 저장</strong>&#8201;&#8212;&#8201;이미 SENDING/SENT인 알림은 다음 실행에서 대상에서 제외</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>판단:</strong> 현재 구조에서 이 시나리오는 안전합니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_시나리오_3_stuckrecovery와_활성_실행의_충돌_위험도_방어됨"><a class="anchor" href="#_시나리오_3_stuckrecovery와_활성_실행의_충돌_위험도_방어됨"></a>시나리오 3: StuckRecovery와 활성 실행의 충돌 (위험도: 방어됨)</h4>
+<div class="paragraph">
+<p><strong>상황:</strong> Job이 `stuckTimeoutSeconds`를 초과했지만 실제로는 아직 발송 중입니다. `StuckProcessingRecoveryScheduler`가 이를 "스턱"으로 오판합니다.</p>
+</div>
+<div class="paragraph">
+<p><strong>방어 구조:</strong></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>분산 락 동일 키</strong>&#8201;&#8212;&#8201;ExecutionProcessor와 StuckRecovery 모두 같은 <code>idempotencyKey`로 락을 시도. 실행 중이면 StuckRecovery가 `tryLock</code> 실패로 스킵</p>
+</li>
+<li>
+<p><strong>락 TTL 만료 시</strong>&#8201;&#8212;&#8201;StuckRecovery가 락을 획득해도 SELECT FOR UPDATE에서 ExecutionProcessor의 트랜잭션이 끝날 때까지 대기. 트랜잭션 완료 후 상태를 확인하면 이미 COMPLETED/FAILED</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p><strong>판단:</strong> 시나리오 2와 동일한 메커니즘으로 방어됩니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_시나리오_4_스케줄_중복_처리_위험도_낮음"><a class="anchor" href="#_시나리오_4_스케줄_중복_처리_위험도_낮음"></a>시나리오 4: 스케줄 중복 처리 (위험도: 낮음)</h4>
+<div class="paragraph">
+<p><strong>상황:</strong> `DbScheduledNotificationJobRelay`에서 두 인스턴스가 같은 스케줄 row를 읽고 각각 처리를 시도합니다.</p>
+</div>
+<div class="paragraph">
+<p><strong>방어:</strong> <code>processScheduledJob`이 REQUIRES_NEW 트랜잭션 안에서 `findByIdAndDeletedFalseForUpdate`로 행 잠금을 잡으므로, 첫 번째 인스턴스가 SCHEDULED → PROCESSING 전이 후, 두 번째 인스턴스는 `markProcessing()</code> 실패로 스킵합니다. Job 중복 전이와 중복 발송 모두 발생하지 않습니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_시나리오_5_recover_uc와_retryingscheduler_레이스_위험도_없음"><a class="anchor" href="#_시나리오_5_recover_uc와_retryingscheduler_레이스_위험도_없음"></a>시나리오 5: Recover UC와 RetryingScheduler 레이스 (위험도: 없음)</h4>
+<div class="paragraph">
+<p><strong>상황:</strong> `RecoverNotificationJobUseCase`가 RETRYING으로 전이하는 동안 `RetryingNotificationJobExecutionScheduler`가 해당 Job을 감지합니다.</p>
+</div>
+<div class="paragraph">
+<p><strong>방어:</strong> RecoverUC는 <code>TransactionTemplate</code> 안에서 RETRYING 전이 + Notification 리셋을 원자적으로 처리하고, 분산 락을 <strong>트랜잭션 커밋 이후에</strong> 해제합니다. RetryingScheduler는 같은 키로 락을 시도하므로 UC 완료 전까지 진입 불가. 완료 후에는 Job(RETRYING) + Notification(RETRY_WAITING)이 모두 커밋된 상태입니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_요약"><a class="anchor" href="#_요약"></a>요약</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 14.2857%;">
+<col style="width: 28.5714%;">
+<col style="width: 14.2857%;">
+<col style="width: 42.8572%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">#</th>
+<th class="tableblock halign-left valign-top">시나리오</th>
+<th class="tableblock halign-left valign-top">위험도</th>
+<th class="tableblock halign-left valign-top">방어 상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">외부 발송 성공 후 크래시 → 재발송</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">높음</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">채널 idempotency 의존 (시스템 레벨 방어 불가)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">같은 Job 이중 실행</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방어됨</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">분산 락 + FOR UPDATE + SENDING 선점</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">StuckRecovery vs 활성 실행</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">방어됨</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">분산 락 + FOR UPDATE (동일 메커니즘)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스케줄 중복 처리</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">낮음</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FOR UPDATE + 상태 재검증</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Recover + RetryingScheduler 레이스</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">없음</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TX 커밋 후 락 해제 + 원자적 리셋</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_현재_모델을_한_문장으로_표현하면"><a class="anchor" href="#_현재_모델을_한_문장으로_표현하면"></a>현재 모델을 한 문장으로 표현하면</h4>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p><strong>정책 기반 상태 머신 + job-level execution dedupe + crash recovery를 가진 at-least-once 발송 모델</strong></p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_트랜잭션_경계_설계"><a class="anchor" href="#_트랜잭션_경계_설계"></a>트랜잭션 경계 설계</h3>
+<div class="paragraph">
+<p>외부 서비스 호출(<code>NotificationJobSchedulePort</code>, <code>NotificationService</code>)은 트랜잭션 밖에서 수행됩니다.
+이 설계의 이유와 각 호출 지점의 실패 시 영향을 정리합니다.</p>
+</div>
+<div class="sect3">
+<h4 id="_원칙"><a class="anchor" href="#_원칙"></a>원칙</h4>
+<div class="paragraph">
+<p>외부 서비스 호출이 트랜잭션 안에 있으면 두 가지 문제가 발생합니다:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>행 잠금 보유 시간 증가</strong>&#8201;&#8212;&#8201;외부 호출 응답 대기 동안 FOR UPDATE 잠금이 유지되어 다른 실행 주체를 차단</p>
+</li>
+<li>
+<p><strong>롤백 시 불일치</strong>&#8201;&#8212;&#8201;외부 호출 성공 후 TX 롤백 시, 외부에는 반영됐지만 DB에는 반영되지 않은 상태 발생</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>따라서 <strong>DB 상태 전이를 먼저 커밋하고, 외부 호출은 이후에 수행</strong>합니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_호출_지점별_설계"><a class="anchor" href="#_호출_지점별_설계"></a>호출 지점별 설계</h4>
+<div class="paragraph">
+<p>외부 스케줄러 호출은 `NotificationJobScheduleEvent`를 통해 분리됩니다.
+이벤트는 상태 전이 TX 안에서 발행되고, Spring Modulith가 TX 커밋 후 별도 TX에서 소비합니다.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 22.2222%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">발행 주체</th>
+<th class="tableblock halign-left valign-top">이벤트 action</th>
+<th class="tableblock halign-left valign-top">소비 동작</th>
+<th class="tableblock halign-left valign-top">소비 실패 시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobCreatedProcessor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>REGISTER</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>schedulePort.schedule()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Job은 SCHEDULED이지만 스케줄 row 없음.<br>
+발송 트리거 안 됨 → 수동 복구 필요</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CancelNotificationJobUseCase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CANCEL</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>schedulePort.cancelSchedule()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">고아 스케줄 잔존.<br>
+Relay가 도달해도 Job이 CANCELLED이므로 <code>markProcessing()</code> 실패 → 스킵</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobSendOrchestrator</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RETRY</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>schedulePort.retrySchedule()</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">자동 재시도 미등록.<br>
+Job은 FAILED이므로 `RecoverNotificationJobUseCase`로 수동 복구 가능</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_분리하지_않는_호출_notificationservice_send"><a class="anchor" href="#_분리하지_않는_호출_notificationservice_send"></a>분리하지 않는 호출: <code>NotificationService.send()</code></h4>
+<div class="paragraph">
+<p><code>NotificationService.send()</code>(외부 채널 발송)는 트랜잭션 안에서 호출됩니다.
+이는 의도적인 설계입니다:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>`sendingStatePersister`가 SENDING 상태를 별도 REQUIRES_NEW TX로 먼저 커밋</p>
+</li>
+<li>
+<p>외부 발송은 `@ApplicationModuleListener`의 TX 안에서 실행</p>
+</li>
+<li>
+<p>발송 결과(SENT/FAILED)와 Job 최종 상태(COMPLETED/FAILED)가 원자적으로 커밋</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>발송을 TX 밖으로 빼면 "발송 성공 + DB 반영 실패" 시 복구가 더 어려워집니다.
+현재 구조에서는 발송과 결과 저장이 같은 TX에 있으므로, 크래시가 아닌 한 일관성이 유지됩니다.</p>
+</div>
+<div class="paragraph">
+<p><strong>트레이드오프:</strong> 외부 발송 응답 대기 동안 행 잠금이 유지됩니다.
+알림 수가 많거나 외부 채널 응답이 느리면 잠금 보유 시간이 길어질 수 있습니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_uc의_락_트랜잭션_순서"><a class="anchor" href="#_uc의_락_트랜잭션_순서"></a>UC의 락-트랜잭션 순서</h4>
+<div class="paragraph">
+<p>UseCase(<code>Cancel</code>, <code>Recover</code>, <code>Create</code>)는 `TransactionTemplate`을 사용하여
+<strong>트랜잭션 커밋 → 분산 락 해제</strong> 순서를 보장합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>try {
+    transactionTemplate.execute(status -&gt; {
+        // DB 작업 (상태 전이, Notification 변경)
+    });
+    // ← TX 커밋 완료
+    // 외부 서비스 호출 (schedulePort 등)
+} finally {
+    distributedLock.unlock(...);
+    // ← 락 해제 — 다른 실행 주체가 진입해도 커밋된 상태를 읽음
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Transactional</code> 대신 `TransactionTemplate`을 사용하는 이유는,
+`@Transactional`에서는 `finally`의 락 해제가 메서드 반환 전에 실행되어
+TX 커밋보다 먼저 락이 풀리는 창(window)이 생기기 때문입니다.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_이벤트_흐름"><a class="anchor" href="#_이벤트_흐름"></a>이벤트 흐름</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 37.5%;">
+<col style="width: 37.5%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">이벤트</th>
+<th class="tableblock halign-left valign-top">발행 주체</th>
+<th class="tableblock halign-left valign-top">소비 주체</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobCreatedEvent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CreateScheduledNotificationJobUseCase</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobCreatedProcessor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobStatusChangedEvent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CancelNotificationJobUseCase</code><br>
+<code>RecoverNotificationJobUseCase</code><br>
+<code>DbScheduledNotificationJobRelay</code><br>
+<code>DbRetryScheduledNotificationRecoverRelay</code><br>
+<code>RetryingNotificationJobExecutionScheduler</code><br>
+<code>StuckProcessingRecoveryScheduler</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobStatusChangedProcessor</code> (이력 기록)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobExecutionEvent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>RetryingNotificationJobExecutionScheduler</code><br>
+<code>ProcessingNotificationJobExecutionScheduler</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobExecutionProcessor</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobScheduleEvent</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobCreatedProcessor</code> (REGISTER)<br>
+<code>CancelNotificationJobUseCase</code> (CANCEL)<br>
+<code>NotificationJobSendOrchestrator</code> (RETRY)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>NotificationJobScheduleProcessor</code> (외부 스케줄러 호출)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+`NotificationJobScheduleEvent`는 상태 전이 TX 안에서 발행되고,
+커밋 후 별도 TX에서 소비됩니다.
+이렇게 분리하여 외부 서비스 호출이 상태 전이 트랜잭션의 행 잠금을 연장하지 않도록 합니다.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_참고"><a class="anchor" href="#_참고"></a>참고</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Job 상태 전이 다이어그램: <code>docs/generated-docs/state/job-state-transition.adoc</code></p>
+</li>
+<li>
+<p>Notification 상태 전이 다이어그램: <code>docs/generated-docs/state/notification-state-transition.adoc</code></p>
+</li>
+<li>
+<p>정책 정의: <code>JobNotificationPolicy.java</code></p>
+</li>
+<li>
+<p>도메인 엔티티: <code>NotificationJob.java</code></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2026-04-07 20:37:20 +0900
+</div>
+</div>
+<script>
+;(function () { /*! Asciidoctor Tabs | Copyright (c) 2018-present Dan Allen | MIT License */
+  'use strict'
+
+  var config = (document.currentScript || {}).dataset || {}
+  var forEach = Array.prototype.forEach
+
+  init(document.querySelectorAll('.tabs'))
+
+  function init (tabsBlocks) {
+    if (!tabsBlocks.length) return
+    forEach.call(tabsBlocks, function (tabs) {
+      var syncIds = tabs.classList.contains('is-sync') ? {} : undefined
+      var tablist = tabs.querySelector('.tablist ul')
+      tablist.setAttribute('role', 'tablist')
+      var start
+      forEach.call(tablist.querySelectorAll('li'), function (tab, idx) {
+        tab.tabIndex = -1
+        tab.setAttribute('role', tab.classList.add('tab') || 'tab')
+        var id, anchor, syncId
+        if (!(id = tab.id) && (anchor = tab.querySelector('a[id]'))) {
+          id = tab.id = anchor.parentNode.removeChild(anchor).id
+        }
+        var panel = id && tabs.querySelector('.tabpanel[aria-labelledby~="' + id + '"]')
+        if (!panel) return idx ? undefined : toggleSelected(tab, true) // invalid state
+        syncIds && (((syncId = tab.textContent.trim()) in syncIds) ? (syncId = undefined) : true) &&
+        (syncIds[(tab.dataset.syncId = syncId)] = tab)
+        idx || (syncIds && (start = { tab: tab, panel: panel })) ? toggleHidden(panel, true) : toggleSelected(tab, true)
+        tab.setAttribute('aria-controls', panel.id)
+        panel.setAttribute('role', 'tabpanel')
+        var onClick = syncId === undefined ? activateTab : activateTabSync
+        tab.addEventListener('click', onClick.bind({ tabs: tabs, tab: tab, panel: panel }))
+      })
+      if (!tabs.closest('.tabpanel')) {
+        forEach.call(tabs.querySelectorAll('.tabpanel table.tableblock'), function (table) {
+          var container = Object.assign(document.createElement('div'), { className: 'tablecontainer' })
+          table.parentNode.insertBefore(container, table).appendChild(table)
+        })
+      }
+      if (start) {
+        var syncGroupId
+        for (var i = 0, lst = tabs.classList, len = lst.length, className; i !== len; i++) {
+          if (!(className = lst.item(i)).startsWith('data-sync-group-id=')) continue
+          tabs.dataset.syncGroupId = syncGroupId = lst.remove(className) || className.slice(19).replace(/\u00a0/g, ' ')
+          break
+        }
+        if (syncGroupId === undefined) tabs.dataset.syncGroupId = syncGroupId = Object.keys(syncIds).sort().join('|')
+        var preferredSyncId = 'syncStorageKey' in config &&
+          window[(config.syncStorageScope || 'local') + 'Storage'].getItem(config.syncStorageKey + '-' + syncGroupId)
+        var tab = preferredSyncId && syncIds[preferredSyncId]
+        tab && Object.assign(start, { tab: tab, panel: document.getElementById(tab.getAttribute('aria-controls')) })
+        toggleSelected(start.tab, true) || toggleHidden(start.panel, false)
+      }
+    })
+    onHashChange()
+    toggleClassOnEach(tabsBlocks, 'is-loading', 'remove')
+    window.setTimeout(toggleClassOnEach.bind(null, tabsBlocks, 'is-loaded', 'add'), 0)
+    window.addEventListener('hashchange', onHashChange)
+  }
+
+  function activateTab (e) {
+    var tab = this.tab
+    var tabs = this.tabs || (this.tabs = tab.closest('.tabs'))
+    var panel = this.panel || (this.panel = document.getElementById(tab.getAttribute('aria-controls')))
+    querySelectorWithSiblings(tabs, '.tablist .tab', 'tab').forEach(function (el) {
+      toggleSelected(el, el === tab)
+    })
+    querySelectorWithSiblings(tabs, '.tabpanel', 'tabpanel').forEach(function (el) {
+      toggleHidden(el, el !== panel)
+    })
+    if (!this.isSync && 'syncStorageKey' in config && 'syncGroupId' in tabs.dataset) {
+      var storageKey = config.syncStorageKey + '-' + tabs.dataset.syncGroupId
+      window[(config.syncStorageScope || 'local') + 'Storage'].setItem(storageKey, tab.dataset.syncId)
+    }
+    if (!e) return
+    var loc = window.location
+    var hashIdx = loc.hash ? loc.href.indexOf('#') : -1
+    if (~hashIdx) window.history.replaceState(null, '', loc.href.slice(0, hashIdx))
+    e.preventDefault()
+  }
+
+  function activateTabSync (e) {
+    activateTab.call(this, e)
+    var thisTabs = this.tabs
+    var thisTab = this.tab
+    var initialY = thisTabs.getBoundingClientRect().y
+    forEach.call(document.querySelectorAll('.tabs'), function (tabs) {
+      if (tabs === thisTabs || tabs.dataset.syncGroupId !== thisTabs.dataset.syncGroupId) return
+      querySelectorWithSiblings(tabs, '.tablist .tab', 'tab').forEach(function (tab) {
+        if (tab.dataset.syncId === thisTab.dataset.syncId) activateTab.call({ tabs: tabs, tab: tab, isSync: true })
+      })
+    })
+    var shiftedBy = thisTabs.getBoundingClientRect().y - initialY
+    if (shiftedBy && (shiftedBy = Math.round(shiftedBy))) window.scrollBy({ top: shiftedBy, behavior: 'instant' })
+  }
+
+  function querySelectorWithSiblings (scope, selector, siblingClass) {
+    var el = scope.querySelector(selector)
+    if (!el) return []
+    var result = [el]
+    while ((el = el.nextElementSibling) && el.classList.contains(siblingClass)) result.push(el)
+    return result
+  }
+
+  function toggleClassOnEach (elements, className, method) {
+    forEach.call(elements, function (el) {
+      el.classList[method](className)
+    })
+  }
+
+  function toggleHidden (el, state) {
+    el.classList[(el.hidden = state) ? 'add' : 'remove']('is-hidden')
+  }
+
+  function toggleSelected (el, state) {
+    el.setAttribute('aria-selected', '' + state)
+    el.classList[state ? 'add' : 'remove']('is-selected')
+    el.tabIndex = state ? 0 : -1
+  }
+
+  function onHashChange () {
+    var id = window.location.hash.slice(1)
+    if (!id) return
+    var tab = document.getElementById(~id.indexOf('%') ? decodeURIComponent(id) : id)
+    if (!(tab && tab.classList.contains('tab'))) return
+    'syncId' in tab.dataset ? activateTabSync.call({ tab: tab }) : activateTab.call({ tab: tab })
+  }
+})()
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+[%autowidth.stretch, cols="h,a"]
+|===
+|Base package
+|`com.notification.notification`
+|Spring components
+|* `c.n.n.port.NotificationJobSchedulePort` (via `c.n.n.adapter.db.DbNotificationJobScheduler`)
+|Bean references
+|* `c.n.i.port.DistributedLock` (in Infra)
+* `c.n.i.port.IdempotencyStore` (in Infra)
+* `c.n.c.email.MockEmailSenderControl` (in Config)
+|Aggregate roots
+|* `c.n.n.domain.Notification`
+* `c.n.n.domain.NotificationContent`
+* `c.n.n.domain.NotificationJob`
+* `c.n.n.domain.NotificationJobStatusChangeHistory`
+* `c.n.n.domain.NotificationReadEvent`
+* `c.n.n.domain.NotificationSendHistory`
+* `c.n.n.domain.ScheduledNotificationJob`
+|Events listened to
+|
+
+
+
+
+* `org.springframework.boot.context.event.ApplicationReadyEvent` 
+|===

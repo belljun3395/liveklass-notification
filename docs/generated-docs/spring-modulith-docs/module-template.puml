@@ -1,0 +1,25 @@
+@startuml
+set separator none
+title Template
+
+top to bottom direction
+
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Component>
+
+Container_Boundary("NotificationApplication.NotificationApplication_boundary", "NotificationApplication", $tags="") {
+  Component(NotificationApplication.NotificationApplication.Support, "Support", $techn="Module", $descr="", $tags="", $link="")
+  Component(NotificationApplication.NotificationApplication.Infra, "Infra", $techn="Module", $descr="", $tags="", $link="")
+  Component(NotificationApplication.NotificationApplication.Notification, "Notification", $techn="Module", $descr="", $tags="", $link="")
+  Component(NotificationApplication.NotificationApplication.Template, "Template", $techn="Module", $descr="", $tags="", $link="")
+}
+
+Rel(NotificationApplication.NotificationApplication.Notification, NotificationApplication.NotificationApplication.Infra, "uses", $techn="", $tags="", $link="")
+Rel(NotificationApplication.NotificationApplication.Template, NotificationApplication.NotificationApplication.Infra, "depends on", $techn="", $tags="", $link="")
+Rel(NotificationApplication.NotificationApplication.Template, NotificationApplication.NotificationApplication.Support, "depends on", $techn="", $tags="", $link="")
+Rel(NotificationApplication.NotificationApplication.Template, NotificationApplication.NotificationApplication.Notification, "uses", $techn="", $tags="", $link="")
+Rel(NotificationApplication.NotificationApplication.Notification, NotificationApplication.NotificationApplication.Support, "depends on", $techn="", $tags="", $link="")
+
+SHOW_LEGEND(true)
+@enduml

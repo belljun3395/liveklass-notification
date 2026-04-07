@@ -1,0 +1,7 @@
+[%autowidth.stretch, cols="h,a"]
+|===
+|Base package
+|`com.notification.support`
+|Spring components
+|* `c.n.s.web.handler.GlobalExceptionHandler`
+|===

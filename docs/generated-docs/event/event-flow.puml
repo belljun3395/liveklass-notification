@@ -1,0 +1,83 @@
+@startuml
+title Event Publishing / Consuming Flow
+top to bottom direction
+
+skinparam component {
+  BackgroundColor #6096C4
+  BorderColor #1A5276
+  FontColor white
+  FontStyle Bold
+}
+skinparam queue {
+  BackgroundColor #F39C12
+  BorderColor #D68910
+  FontColor white
+}
+skinparam rectangle {
+  BackgroundColor #F8F9FA
+  BorderColor #AEB6BF
+  FontColor #2C3E50
+  FontStyle Bold
+  RoundCorner 10
+}
+skinparam backgroundColor white
+
+rectangle "Schedule" {
+  component "ProcessingNJExecutionScheduler" as cls_ProcessingNotificationJobExecutionScheduler
+  component "RetryingNJExecutionScheduler" as cls_RetryingNotificationJobExecutionScheduler
+  component "StuckProcessingRecoveryScheduler" as cls_StuckProcessingRecoveryScheduler
+}
+
+rectangle "Relay" {
+  component "DbScheduledNJRelay" as cls_DbScheduledNotificationJobRelay
+  component "DbRetryScheduledN.RecoverRelay" as cls_DbRetryScheduledNotificationRecoverRelay
+}
+
+rectangle "UC" {
+  component "CreateScheduledNJUseCase" as cls_CreateScheduledNotificationJobUseCase
+  component "CancelNJUseCase" as cls_CancelNotificationJobUseCase
+  component "RecoverNJUseCase" as cls_RecoverNotificationJobUseCase
+  component "ReadN.UseCase" as cls_ReadNotificationUseCase
+}
+
+rectangle "Service" {
+  component "NJSendOrchestrator" as cls_NotificationJobSendOrchestrator
+}
+
+rectangle "Event" {
+  queue "N.JobCreatedEvent" as evt_NotificationJobCreatedEvent
+  queue "N.JobExecutionEvent" as evt_NotificationJobExecutionEvent
+  queue "N.JobScheduleEvent" as evt_NotificationJobScheduleEvent
+  queue "N.JobStatusChangedEvent" as evt_NotificationJobStatusChangedEvent
+  queue "N.ReadEvent" as evt_NotificationReadEvent
+}
+
+rectangle "Processor" {
+  component "NJCreatedProcessor" as cls_NotificationJobCreatedProcessor
+  component "NJExecutionProcessor" as cls_NotificationJobExecutionProcessor
+  component "NJScheduleProcessor" as cls_NotificationJobScheduleProcessor
+  component "NJStatusChangedProcessor" as cls_NotificationJobStatusChangedProcessor
+  component "N.ReadProcessor" as cls_NotificationReadProcessor
+}
+
+cls_CreateScheduledNotificationJobUseCase --> evt_NotificationJobCreatedEvent : publish
+cls_ProcessingNotificationJobExecutionScheduler --> evt_NotificationJobExecutionEvent : publish
+cls_RetryingNotificationJobExecutionScheduler --> evt_NotificationJobExecutionEvent : publish
+cls_CancelNotificationJobUseCase --> evt_NotificationJobScheduleEvent : publish
+cls_NotificationJobCreatedProcessor --> evt_NotificationJobScheduleEvent : publish
+cls_NotificationJobSendOrchestrator --> evt_NotificationJobScheduleEvent : publish
+cls_RecoverNotificationJobUseCase --> evt_NotificationJobStatusChangedEvent : publish
+cls_DbScheduledNotificationJobRelay --> evt_NotificationJobStatusChangedEvent : publish
+cls_DbRetryScheduledNotificationRecoverRelay --> evt_NotificationJobStatusChangedEvent : publish
+cls_StuckProcessingRecoveryScheduler --> evt_NotificationJobStatusChangedEvent : publish
+cls_CancelNotificationJobUseCase --> evt_NotificationJobStatusChangedEvent : publish
+cls_RetryingNotificationJobExecutionScheduler --> evt_NotificationJobStatusChangedEvent : publish
+cls_ReadNotificationUseCase --> evt_NotificationReadEvent : publish
+
+evt_NotificationJobCreatedEvent --> cls_NotificationJobCreatedProcessor : consume
+evt_NotificationJobExecutionEvent --> cls_NotificationJobExecutionProcessor : consume
+evt_NotificationJobScheduleEvent --> cls_NotificationJobScheduleProcessor : consume
+evt_NotificationJobStatusChangedEvent --> cls_NotificationJobStatusChangedProcessor : consume
+evt_NotificationReadEvent --> cls_NotificationReadProcessor : consume
+
+@enduml

@@ -1,0 +1,7 @@
+[%autowidth.stretch, cols="h,a"]
+|===
+|Base package
+|`com.notification.template`
+|Bean references
+|* `c.n.n.port.TemplateRenderer` (in Notification)
+|===

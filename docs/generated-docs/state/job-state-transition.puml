@@ -1,0 +1,29 @@
+@startuml
+title Job State Transitions
+hide empty description
+
+skinparam state {
+  BackgroundColor #6096C4
+  BorderColor #1A5276
+  FontColor white
+  FontStyle Bold
+  ArrowColor #555555
+  ArrowFontColor #555555
+}
+skinparam backgroundColor white
+
+[*] --> CREATED
+
+CREATED --> CANCELLED : TO_CANCELLED
+CREATED --> SCHEDULED : TO_SCHEDULED
+SCHEDULED --> CANCELLED : TO_CANCELLED
+SCHEDULED --> PROCESSING : TO_PROCESSING
+PROCESSING --> FAILED : TO_FAILED
+PROCESSING --> COMPLETED : TO_COMPLETED
+CANCELLED --> RETRYING : TO_RETRYING
+COMPLETED --> [*]
+FAILED --> RETRYING : TO_RETRYING
+RETRYING --> CANCELLED : TO_CANCELLED
+RETRYING --> PROCESSING : TO_PROCESSING
+
+@enduml

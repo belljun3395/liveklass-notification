@@ -1,0 +1,23 @@
+== NotificationApplication
+plantuml::components.puml[,,format=svg]
+
+== Config
+plantuml::module-config.puml[,,format=svg]
+include::module-config.adoc[]
+
+== Support
+plantuml::module-support.puml[,,format=svg]
+include::module-support.adoc[]
+
+== Infra
+plantuml::module-infra.puml[,,format=svg]
+include::module-infra.adoc[]
+
+== Notification
+plantuml::module-notification.puml[,,format=svg]
+include::module-notification.adoc[]
+
+== Template
+plantuml::module-template.puml[,,format=svg]
+include::module-template.adoc[]
+

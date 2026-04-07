@@ -1,0 +1,19 @@
+[%autowidth.stretch, cols="h,a"]
+|===
+|Base package
+|`com.notification.config`
+|Spring components
+|_Configuration properties_
+
+* `c.n.c.email.MockEmailSenderControl`
+
+_Others_
+
+* `c.n.c.async.AsyncConfig`
+* `c.n.c.email.MockEmailConfig`
+* `c.n.c.email.MockEmailSenderEndpoint`
+* `c.n.c.event.EventPublicationCleanupScheduler`
+* `c.n.c.jpa.JpaAuditingConfig`
+* `c.n.c.object.JacksonConfig`
+* `c.n.c.web.WebConfig`
+|===
