@@ -1,0 +1,24 @@
+spring:
+    jpa:
+        hibernate:
+            ddl-auto: create-drop
+        show-sql: true
+
+    modulith:
+        events:
+            completion-mode: archive
+
+management:
+    otlp:
+        tracing:
+            endpoint: ""
+
+notification:
+    batch:
+        size: 10
+
+mock:
+    email:
+        fail-rate: 0.0
+        hang-rate: 0.0
+        latency-ms: 0
