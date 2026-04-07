@@ -1,0 +1,91 @@
+spring:
+    application:
+        name: liveklass-notification
+
+    threads:
+        virtual:
+            enabled: true
+
+    lifecycle:
+        timeout-per-shutdown-phase: 30s
+
+    docker:
+        compose:
+            enabled: true
+
+    sql:
+        init:
+            mode: always
+
+    datasource:
+        url: jdbc:postgresql://localhost:5432/notification
+        username: notification
+        password: notification
+        driver-class-name: org.postgresql.Driver
+        hikari:
+            maximum-pool-size: 20
+            minimum-idle: 5
+            connection-timeout: 5000
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                jdbc:
+                    batch_size: 500
+                order_inserts: true
+                format_sql: true
+        show-sql: false
+        open-in-view: false
+
+    modulith:
+        events:
+            completion-mode: archive
+
+logging:
+    level:
+        com.notification: DEBUG
+        org.hibernate.SQL: DEBUG
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health, info, scheduledtasks, prometheus, mock-email, application-modules
+    metrics:
+        tags:
+            application: liveklass-notification
+
+notification:
+    response-timezone: "+09:00"
+    relay:
+        schedule:
+            fixed-delay-ms: 2000
+            batch-size: 50
+        retry-schedule:
+            fixed-delay-ms: 2000
+            batch-size: 20
+    handler:
+        created-idempotency-ttl: 5m
+        execution-idempotency-ttl: 10m
+    retry:
+        max-send-try-count: 3
+        base-delay: 5s
+        max-delay: 30s
+    batch:
+        size: 200
+    stuck-recovery:
+        fixed-delay-ms: 10000
+        batch-size: 50
+        stuck-timeout-seconds: 30
+    metrics:
+        poll-interval-ms: 5000
+
+mock:
+    email:
+        fail-rate: 0.3
+        fail-type: TRANSIENT
+        latency-ms: 50
+        hang-rate: 0.0
+        hang-timeout-ms: 30000
