@@ -54,6 +54,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:postgresql'
     testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.3.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -70,4 +71,22 @@ spotless {
         trimTrailingWhitespace()
         endWithNewline()
     }
+}
+
+tasks.register('generateStateDocs', JavaExec) {
+    description = 'Job/Notification 상태 전이 PlantUML 다이어그램과 AsciiDoc 표를 생성한다'
+    group = 'documentation'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.notification.docs.StateTransitionDocGenerator'
+    outputs.dir layout.buildDirectory.dir('generated-docs/state')
+}
+
+tasks.register('generateEventFlowDocs', JavaExec) {
+    description = '이벤트 발행/소비 흐름 PlantUML 다이어그램과 AsciiDoc 표를 생성한다'
+    group = 'documentation'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.notification.docs.EventFlowDocGenerator'
+    outputs.dir layout.buildDirectory.dir('generated-docs/event')
 }
