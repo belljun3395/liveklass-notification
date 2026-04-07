@@ -1,0 +1,163 @@
+### liveklass-notification | 02 - 알림 Job 라이프사이클
+
+@baseUrl = {{baseUrl}}
+
+# ──────────────────────────────────────────────────────────────
+# Step 1: 멱등성 키 발급
+# ──────────────────────────────────────────────────────────────
+
+### [1] 멱등성 키 발급
+POST {{baseUrl}}/api/notification-jobs/key
+
+> {%
+    client.global.set("idempotencyKey", response.body.data.idempotencyKey);
+    client.log("발급된 idempotencyKey: " + response.body.data.idempotencyKey);
+%}
+
+# ──────────────────────────────────────────────────────────────
+# Step 2: 알림 Job 생성 (예약 발송)
+# ──────────────────────────────────────────────────────────────
+
+### [2a] Job 생성 — enrollment-complete / 단일 수신자
+# pre-request 스크립트가 scheduledAt을 내일 10:00으로 자동 설정합니다.
+< {%
+var d = new Date();
+d.setDate(d.getDate() + 1);
+var pad = function(n) { return String(n).padStart(2, '0'); };
+client.global.set("scheduledAt", d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T10:00:00');
+%}
+POST {{baseUrl}}/api/notification-jobs
+Content-Type: application/json
+
+{
+  "idempotencyKey": "{{idempotencyKey}}",
+  "channel": "EMAIL",
+  "templateCode": "enrollment-complete",
+  "locale": "ko",
+  "type": "ENROLLMENT_COMPLETE",
+  "metadata": {
+    "eventId": "evt-demo-001",
+    "lectureId": "lec-spring-boot"
+  },
+  "scheduledAt": "{{scheduledAt}}",
+  "recipients": [
+    {
+      "recipientId": 1001,
+      "contact": "{{recipientEmail}}",
+      "variables": {
+        "name": "홍길동",
+        "lectureTitle": "Spring Boot 마스터 클래스",
+        "instructorName": "김강사",
+        "startDate": "2026-05-01"
+      }
+    }
+  ]
+}
+
+> {%
+    client.global.set("jobId", String(response.body.data.jobId));
+    client.log("생성된 jobId: " + response.body.data.jobId);
+%}
+
+### [2b-key] 다중 수신자용 멱등성 키 재발급
+POST {{baseUrl}}/api/notification-jobs/key
+
+> {%
+    client.global.set("idempotencyKey", response.body.data.idempotencyKey);
+%}
+
+### [2b] Job 생성 — 다중 수신자 (3명)
+# pre-request 스크립트가 scheduledAt을 내일 10:00으로 자동 설정합니다.
+# 03-notifications.http [4]에서 userId=1002/1003 알림을 확인하려면
+# scheduledAt(내일 10:00)이 지난 뒤 relay가 처리해야 합니다.
+< {%
+var d = new Date();
+d.setDate(d.getDate() + 1);
+var pad = function(n) { return String(n).padStart(2, '0'); };
+client.global.set("scheduledAt", d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T10:00:00');
+%}
+POST {{baseUrl}}/api/notification-jobs
+Content-Type: application/json
+
+{
+  "idempotencyKey": "{{idempotencyKey}}",
+  "channel": "EMAIL",
+  "templateCode": "enrollment-complete",
+  "locale": "ko",
+  "type": "ENROLLMENT_COMPLETE",
+  "metadata": {"eventId": "evt-demo-multi"},
+  "scheduledAt": "{{scheduledAt}}",
+  "recipients": [
+    {
+      "recipientId": 1001,
+      "contact": "user1@test.com",
+      "variables": {"name": "사용자1", "lectureTitle": "React 완전정복", "instructorName": "이강사", "startDate": "2026-05-10"}
+    },
+    {
+      "recipientId": 1002,
+      "contact": "user2@test.com",
+      "variables": {"name": "사용자2", "lectureTitle": "React 완전정복", "instructorName": "이강사", "startDate": "2026-05-10"}
+    },
+    {
+      "recipientId": 1003,
+      "contact": "user3@test.com",
+      "variables": {"name": "사용자3", "lectureTitle": "React 완전정복", "instructorName": "이강사", "startDate": "2026-05-10"}
+    }
+  ]
+}
+
+> {%
+    client.global.set("jobId", String(response.body.data.jobId));
+%}
+
+### [2c] 멱등성 확인 — 동일 키로 재요청 (200 OK, 기존 Job 반환)
+# 요청 body가 달라도 같은 idempotencyKey면 기존 Job을 그대로 반환합니다.
+POST {{baseUrl}}/api/notification-jobs
+Content-Type: application/json
+
+{
+  "idempotencyKey": "{{idempotencyKey}}",
+  "channel": "EMAIL",
+  "templateCode": "enrollment-complete",
+  "locale": "ko",
+  "type": "ENROLLMENT_COMPLETE",
+  "scheduledAt": "{{scheduledAt}}",
+  "recipients": [
+    {"recipientId": 1001, "contact": "user1@test.com", "variables": {"name": "홍길동", "lectureTitle": "테스트", "instructorName": "강사", "startDate": "2026-05-01"}}
+  ]
+}
+
+# ──────────────────────────────────────────────────────────────
+# Step 3: Job 상태 조회
+# ──────────────────────────────────────────────────────────────
+
+### [3] Job 상태 조회
+# status: CREATED → SCHEDULED → PROCESSING → COMPLETED/FAILED
+GET {{baseUrl}}/api/notification-jobs/{{jobId}}
+
+# ──────────────────────────────────────────────────────────────
+# Step 4: Job 취소 (CREATED / SCHEDULED / RETRYING 상태에서만 가능)
+# PROCESSING 상태에서는 IllegalStateException 발생
+# ──────────────────────────────────────────────────────────────
+
+### [4] Job 취소
+DELETE {{baseUrl}}/api/notification-jobs/{{jobId}}
+
+# ──────────────────────────────────────────────────────────────
+# Step 5: Job 복구 (FAILED / CANCELLED 상태에서만 가능)
+# DEAD_LETTER / CANCELLED 알림 → RETRY_WAITING으로 초기화
+# ──────────────────────────────────────────────────────────────
+
+### [5] Job 복구 (수동 재시도)
+POST {{baseUrl}}/api/notification-jobs/{{jobId}}/recover
+
+# ──────────────────────────────────────────────────────────────
+# 참고: jobId를 직접 지정해야 할 때
+# ──────────────────────────────────────────────────────────────
+
+### [6] 특정 jobId로 조회 (직접 지정)
+# 자동 순차 실행 시 specificJobId = 0 이므로 404가 반환됩니다 (정상).
+# 실제 jobId로 테스트하려면 아래 값을 직접 수정한 뒤 단독 실행하세요.
+@specificJobId = 0
+
+GET {{baseUrl}}/api/notification-jobs/{{specificJobId}}

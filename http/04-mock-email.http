@@ -1,0 +1,112 @@
+### liveklass-notification | 04 - MockEmailSender 제어
+### local / dev 프로파일 전용 (prod 에서는 이 엔드포인트가 비활성화됩니다)
+###
+### MockEmailSender 는 실제 메일 서버 없이 이메일 발송을 시뮬레이션합니다.
+### Actuator 엔드포인트로 런타임에 실패율, 지연, hang 등을 동적으로 주입할 수 있습니다.
+
+@baseUrl = {{baseUrl}}
+
+# ──────────────────────────────────────────────────────────────
+# 1. 현재 설정 조회
+# ──────────────────────────────────────────────────────────────
+
+### [1] 현재 MockEmailSender 설정 조회
+# 응답 예시:
+# { "failRate": 0.05, "failType": "TRANSIENT", "latencyMs": 0, "hangRate": 0.0, "hangTimeoutMs": 30000 }
+GET {{baseUrl}}/actuator/mock-email
+
+# ──────────────────────────────────────────────────────────────
+# 2. 정상 발송 모드 (failRate=0)
+# ──────────────────────────────────────────────────────────────
+
+### [2] 실패 없이 즉시 발송 (기본 상태로 초기화)
+POST {{baseUrl}}/actuator/mock-email
+Content-Type: application/json
+
+{
+  "failRate": 0.0,
+  "latencyMs": 0,
+  "hangRate": 0.0
+}
+
+# ──────────────────────────────────────────────────────────────
+# 3. 일시적 실패 시뮬레이션 (TRANSIENT — 재시도 대상)
+# ──────────────────────────────────────────────────────────────
+
+### [3] 50% TRANSIENT 실패 주입 (재시도 흐름 확인용)
+POST {{baseUrl}}/actuator/mock-email
+Content-Type: application/json
+
+{
+  "failRate": 0.5,
+  "failType": "TRANSIENT"
+}
+
+### [4] 100% TRANSIENT 실패 (모든 발송 실패 → RETRY_WAITING 전이 확인)
+POST {{baseUrl}}/actuator/mock-email
+Content-Type: application/json
+
+{
+  "failRate": 1.0,
+  "failType": "TRANSIENT"
+}
+
+# ──────────────────────────────────────────────────────────────
+# 4. 영구 실패 시뮬레이션 (PERMANENT — DEAD_LETTER 전이)
+# ──────────────────────────────────────────────────────────────
+
+### [5] 100% PERMANENT 실패 (재시도 없이 DEAD_LETTER로 전이)
+POST {{baseUrl}}/actuator/mock-email
+Content-Type: application/json
+
+{
+  "failRate": 1.0,
+  "failType": "PERMANENT"
+}
+
+# ──────────────────────────────────────────────────────────────
+# 5. 지연 / hang 시뮬레이션
+# ──────────────────────────────────────────────────────────────
+
+### [6] 500ms 지연 발송 (타임아웃 동작 확인용)
+# failType, hangRate 명시: 이전 [5]의 PERMANENT 설정이 누적되지 않도록 초기화
+POST {{baseUrl}}/actuator/mock-email
+Content-Type: application/json
+
+{
+  "failRate": 0.0,
+  "failType": "TRANSIENT",
+  "latencyMs": 500,
+  "hangRate": 0.0
+}
+
+### [7] hang 20% 확률 주입 (5초 hang — Virtual Thread 점유 확인용)
+# latencyMs 명시: 이전 [6]의 500ms 지연이 누적되지 않도록 초기화
+POST {{baseUrl}}/actuator/mock-email
+Content-Type: application/json
+
+{
+  "failRate": 0.0,
+  "failType": "TRANSIENT",
+  "latencyMs": 0,
+  "hangRate": 0.2,
+  "hangTimeoutMs": 5000
+}
+
+# ──────────────────────────────────────────────────────────────
+# 6. 복합 시나리오
+# ──────────────────────────────────────────────────────────────
+
+### [8] 실패 30% + 200ms 지연 (현실적 부하 테스트 기본값)
+POST {{baseUrl}}/actuator/mock-email
+Content-Type: application/json
+
+{
+  "failRate": 0.3,
+  "failType": "TRANSIENT",
+  "latencyMs": 200,
+  "hangRate": 0.0
+}
+
+### [9] 설정 확인 — 변경 적용 여부 재조회
+GET {{baseUrl}}/actuator/mock-email

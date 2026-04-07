@@ -1,0 +1,91 @@
+### liveklass-notification | 01 - 템플릿 관리
+@baseUrl = {{baseUrl}}
+
+# ──────────────────────────────────────────────────────────────
+# 1. 템플릿 생성 (새 템플릿 코드로 직접 생성하는 예시)
+# ──────────────────────────────────────────────────────────────
+
+### [1] 새 템플릿 생성 — welcome-demo
+POST {{baseUrl}}/api/templates
+Content-Type: application/json
+
+{
+  "code": "welcome-demo",
+  "channel": "EMAIL",
+  "locale": "ko",
+  "titleTemplate": "{{name}}님, 가입을 환영합니다!",
+  "bodyTemplate": "{{name}}님, LiveKlass에 오신 걸 환영합니다.\n\n지금 바로 {{lectureTitle}}을 수강해보세요.",
+  "description": "가입 환영 이메일 (직접 생성 예시)",
+  "variables": [
+    {"name": "name",         "dataType": "STRING", "required": true,  "exampleValue": "홍길동",           "description": "수신자 이름"},
+    {"name": "lectureTitle", "dataType": "STRING", "required": false, "exampleValue": "Spring Boot 입문", "description": "추천 강좌 제목"}
+  ]
+}
+
+> {%
+client.global.set("createdTemplateId", String(response.body.data.id));
+client.log("생성된 templateId: " + response.body.data.id);
+%}
+
+# ──────────────────────────────────────────────────────────────
+# 2. 템플릿 코드로 목록 조회
+# ──────────────────────────────────────────────────────────────
+
+### [2] 코드로 목록 조회 — enrollment-complete (DemoData 자동 생성)
+GET {{baseUrl}}/api/templates?code=enrollment-complete
+
+> {%
+client.global.set("enrollmentTemplateId", String(response.body.data[0].id));
+%}
+
+### [3] 코드로 목록 조회 — lecture-reminder
+GET {{baseUrl}}/api/templates?code=lecture-reminder
+
+### [4] 코드로 목록 조회 — payment-complete
+GET {{baseUrl}}/api/templates?code=payment-complete
+
+### [5] 코드로 목록 조회 — 직접 생성한 welcome-demo
+GET {{baseUrl}}/api/templates?code=welcome-demo
+
+# ──────────────────────────────────────────────────────────────
+# 3. 특정 템플릿 ID 조회 (위 응답에서 id 복사 후 사용)
+# ──────────────────────────────────────────────────────────────
+
+### [6] ID로 단건 조회
+# @note: {{createdTemplateId}}는 [1] 실행 후 자동 설정됩니다.
+GET {{baseUrl}}/api/templates/{{createdTemplateId}}
+
+# ──────────────────────────────────────────────────────────────
+# 4. 템플릿 미리보기 (변수 바인딩 렌더링)
+# ──────────────────────────────────────────────────────────────
+
+### [7] 미리보기 — enrollment-complete ([2] 실행 후 자동으로 ID가 설정됩니다)
+POST {{baseUrl}}/api/templates/{{enrollmentTemplateId}}/preview
+Content-Type: application/json
+
+{
+  "variables": {
+    "name": "홍길동",
+    "lectureTitle": "Spring Boot 마스터 클래스",
+    "instructorName": "김강사",
+    "startDate": "2026-05-01"
+  }
+}
+
+### [8] 미리보기 — welcome-demo (직접 생성한 템플릿)
+POST {{baseUrl}}/api/templates/{{createdTemplateId}}/preview
+Content-Type: application/json
+
+{
+  "variables": {
+    "name": "테스트유저",
+    "lectureTitle": "Kotlin 완전정복"
+  }
+}
+
+# ──────────────────────────────────────────────────────────────
+# 5. 템플릿 삭제 (soft delete)
+# ──────────────────────────────────────────────────────────────
+
+### [9] 삭제 — 직접 생성한 welcome-demo
+DELETE {{baseUrl}}/api/templates/{{createdTemplateId}}

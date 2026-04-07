@@ -1,0 +1,77 @@
+### liveklass-notification | 03 - 알림 조회 및 읽음 처리
+###
+### 사전 조건: 02-notification-jobs.http의 [2]를 먼저 실행하고
+###            스케줄 시간이 지나 발송이 완료될 때까지 기다립니다.
+###            (local 프로파일: relay 주기 2초, 즉시 발송)
+
+@baseUrl = {{baseUrl}}
+
+# ──────────────────────────────────────────────────────────────
+# 1. 사용자 알림 목록 조회
+# ──────────────────────────────────────────────────────────────
+
+### [1] 전체 알림 목록 (userId=1001, 최신순)
+GET {{baseUrl}}/api/users/1001/notifications?size=20
+
+> {%
+var items = response.body.data.items;
+if (items && items.length > 0) {
+    client.global.set("notificationId", String(items[0].id));
+    client.log("캡처된 notificationId: " + items[0].id);
+}
+%}
+
+### [2] 읽지 않은 알림만 조회
+GET {{baseUrl}}/api/users/1001/notifications?read=false&size=20
+
+### [3] 읽은 알림만 조회
+GET {{baseUrl}}/api/users/1001/notifications?read=true&size=20
+
+### [4] 다른 사용자 알림 조회 (userId=1002, 다중 수신자 Job으로 생성했을 때)
+GET {{baseUrl}}/api/users/1002/notifications?size=20
+
+# ──────────────────────────────────────────────────────────────
+# 2. 단건 알림 조회
+# ──────────────────────────────────────────────────────────────
+
+### [5] 알림 단건 조회 ([1] 실행 후 자동으로 ID가 설정됩니다)
+GET {{baseUrl}}/api/notifications/{{notificationId}}
+
+> {%
+if (response.body.data) {
+    client.global.set("notificationId", String(response.body.data.id));
+}
+%}
+
+# ──────────────────────────────────────────────────────────────
+# 3. 읽음 처리
+# ──────────────────────────────────────────────────────────────
+
+### [6] 읽음 처리 (userId 파라미터 필수)
+# 응답: 202 Accepted (비동기 처리)
+# 처리 후 firstReadAt 필드가 채워집니다.
+PATCH {{baseUrl}}/api/notifications/{{notificationId}}/read?userId=1001
+Content-Type: application/json
+
+{
+  "deviceId": "device-abc-123",
+  "deviceType": "MOBILE"
+}
+
+### [7] 읽음 처리 — deviceId 없이 (body 생략 가능)
+PATCH {{baseUrl}}/api/notifications/{{notificationId}}/read?userId=1001
+
+### [8] 읽음 처리 멱등성 확인 — 두 번 호출해도 firstReadAt이 바뀌지 않음
+PATCH {{baseUrl}}/api/notifications/{{notificationId}}/read?userId=1001
+Content-Type: application/json
+
+{
+  "deviceId": "device-xyz-999",
+  "deviceType": "WEB"
+}
+
+### [9] 읽음 처리 후 상태 확인 — firstReadAt이 채워졌는지 확인
+# 주의: 읽음 처리([6]~[8])는 202 Accepted 비동기 처리입니다.
+# 자동 순차 실행 시 async 스레드가 커밋되기 전에 이 요청이 실행되어 firstReadAt이 null로 보일 수 있습니다.
+# ijhttp 연속 실행 중 null이 나오면 이 요청만 별도로 재실행하세요.
+GET {{baseUrl}}/api/notifications/{{notificationId}}
