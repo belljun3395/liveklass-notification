@@ -1,8 +1,6 @@
 -- ============================================================
 -- Notification Service Schema (PostgreSQL)
 -- ============================================================
--- spring.jpa.hibernate.ddl-auto=validate 환경에서 사용합니다.
--- Spring Modulith의 event_publication 테이블은 자동 생성되므로 여기에 포함하지 않습니다.
 
 -- ── notification_jobs ────────────────────────────────────────
 
